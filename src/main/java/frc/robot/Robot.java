@@ -98,6 +98,7 @@ public class Robot extends TimedRobot {
     RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
 
     RobotMap.collectMode = false;
+    RobotMap.autoMode = false;
 
     // limelight.activateUSBCamera();
     // limelight.turnOffLED();
@@ -163,9 +164,6 @@ public class Robot extends TimedRobot {
     // limelight.m_autoSelected = limelight.m_chooser.getSelected();
     m_autoSelected = m_chooser.getSelected();
 
-    // intake.intakeExtender.set(0.6);
-    // Timer.delay(3);
-    // intake.intakeExtender.set(0.0);
 
   }
 
@@ -180,7 +178,11 @@ public class Robot extends TimedRobot {
 
     // Rotates about z-axis until it finds a target
     if (m_LimelightHasValidTarget) {
-      drivetrain.drivetrain.arcadeDrive(-1 * m_LimelightDriveCommand, -1 * m_LimelightSteerCommand);
+      if (m_LimelightDriveCommand < 0.1) {
+        magazine.magazineSpark.set(RobotMap.magazinePower);
+      } else {
+        drivetrain.drivetrain.arcadeDrive(-1 * m_LimelightDriveCommand, -1 * m_LimelightSteerCommand);
+      }
     }
     else {
       drivetrain.turnAround();
@@ -190,6 +192,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     // This is called once when the robot first enters teleoperated mode
+    magazine.magazineSpark.set(0.0);
+
+    // intake.intakeExtender.set(0.6);
+    // Timer.delay(3);
+    // intake.intakeExtender.set(0.0);
   }
 
   @Override
