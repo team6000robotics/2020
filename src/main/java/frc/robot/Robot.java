@@ -22,7 +22,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import java.lang.System;
-import edu.wpi.first.wpilibj.Timer;
+// import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -206,6 +206,9 @@ public class Robot extends TimedRobot {
 
     updateTrackingData();
 
+    System.out.println(magazine.magazineEncoder.getDistance());
+
+    
     if (XboxController1.getYButtonPressed()) {
       RobotMap.autoMode = ! RobotMap.autoMode;
     }
@@ -249,7 +252,12 @@ public class Robot extends TimedRobot {
 
     // Intake
 
+    // In
     intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * RobotMap.intakeSpeed);
+    
+    // Out
+    intake.intakeRoller.set(XboxController1.getTriggerAxis(Hand.kRight) * RobotMap.intakeSpeed * -1);
+    
   
 
     // Left Bumper - Straight Forward
@@ -323,63 +331,78 @@ public class Robot extends TimedRobot {
 
 
 
-    // Start Button - Shoot One Ball
-    if (XboxController0.getStartButtonPressed()) {
-      RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
-      if (RobotMap.rotationMode) {
-        magazine.rotateMagazine();
-        RobotMap.numberOfBalls--;
-      }
-      else {
-        // intake.intakeRoller.set(RobotMap.intakeSpeedAdjusted);
-        magazine.shootBall();
-      }
+    // // Start Button - Shoot One Ball
+    // if (XboxController0.getBButtonPressed()) {
+    //   RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
+    //   if (RobotMap.rotationMode) {
+    //     magazine.rotateMagazine();
+    //     RobotMap.numberOfBalls--;
+    //   }
+    //   else {
+    //     // intake.intakeRoller.set(RobotMap.intakeSpeedAdjusted);
+    //     magazine.shootBall();
+    //   }
       
-    }
+    // }
 
-    if (XboxController0.getStartButtonReleased()) {
-      magazine.magazineSpark.set(0.0);
-    }
+    // if (XboxController0.getBButtonReleased()) {
+    //   magazine.magazineSpark.set(0.0);
+    // }
 
 
 
-    // Back Button - Index One Ball
-    if (XboxController0.getBackButtonPressed()) {
+    // A Button - Index One Ball
+    if (XboxController0.getAButtonPressed()) {
       if (RobotMap.rotationMode) {
         magazine.rotateMagazine();
         RobotMap.numberOfBalls++;
-
-      }
-      else if (! RobotMap.activateSensor) {
-        // if (RobotMap.numberOfBalls == 2) {
-        //   // RobotMap.numberOfBalls++;
-        //   RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed / 2;
+        // if (magazine.magazineEncoder.getDistance() < RobotMap.magazineRotationDistance) {
+        //   magazine.magazineSpark.set(RobotMap.magazinePower);
         // }
-        
-        if (RobotMap.numberOfBalls == 0) {
-          tempIndexDelay = RobotMap.indexDelayAdjusted * 0.8;
-        }
-        if (RobotMap.numberOfBalls == 1) {
-          tempIndexDelay = RobotMap.indexDelayAdjusted;
-          // intake.intakeRoller.set(RobotMap.intakeSpeedAdjusted * 1.2);
-        }
-        if (RobotMap.numberOfBalls == 2) {
-          tempIndexDelay = RobotMap.indexDelayAdjusted * 0.4;
-        }
-        if (RobotMap.numberOfBalls == 3) {
-          tempIndexDelay = RobotMap.indexDelayAdjusted * 0.85;
-        }
-        // RobotMap.numberOfBalls++;
-        magazine.magazineSpark.set(RobotMap.magazinePower);
-        Timer.delay(tempIndexDelay);
-        // RobotMap.numberOfBalls++;
-        // magazine.magazineSpark.set(0.5);
-        // Timer.delay(RobotMap.indexDelayAdjusted);
-        magazine.magazineSpark.set(0.0);
+        // else {
 
-      RobotMap.numberOfBalls++;
+        //   magazine.magazineSpark.set(0.0);
+        //   magazine.magazineEncoder.reset();
+        
+        
+        //   RobotMap.numberOfBalls++;
+        // }
+
       }
+      // else if (! RobotMap.activateSensor) {
+      //   // if (RobotMap.numberOfBalls == 2) {
+      //   //   // RobotMap.numberOfBalls++;
+      //   //   RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed / 2;
+      //   // }
+        
+      //   if (RobotMap.numberOfBalls == 0) {
+      //     tempIndexDelay = RobotMap.indexDelayAdjusted * 0.8;
+      //   }
+      //   if (RobotMap.numberOfBalls == 1) {
+      //     tempIndexDelay = RobotMap.indexDelayAdjusted;
+      //     // intake.intakeRoller.set(RobotMap.intakeSpeedAdjusted * 1.2);
+      //   }
+      //   if (RobotMap.numberOfBalls == 2) {
+      //     tempIndexDelay = RobotMap.indexDelayAdjusted * 0.4;
+      //   }
+      //   if (RobotMap.numberOfBalls == 3) {
+      //     tempIndexDelay = RobotMap.indexDelayAdjusted * 0.85;
+      //   }
+      //   // RobotMap.numberOfBalls++;
+      //   magazine.magazineSpark.set(RobotMap.magazinePower);
+      //   Timer.delay(tempIndexDelay);
+      //   // RobotMap.numberOfBalls++;
+      //   // magazine.magazineSpark.set(0.5);
+      //   // Timer.delay(RobotMap.indexDelayAdjusted);
+      //   magazine.magazineSpark.set(0.0);
+
+      // RobotMap.numberOfBalls++;
+      // }
     }
+
+    if (XboxController0.getAButtonReleased()) {
+      magazine.magazineSpark.set(0.0);
+      }
 
       
       // if (RobotMap.numberOfBalls >= 3 && ! RobotMap.delayIsAdjusted) {
@@ -388,9 +411,7 @@ public class Robot extends TimedRobot {
       // }
     
 
-    if (XboxController0.getBackButtonReleased()) {
-      magazine.magazineSpark.set(0.0);
-      }
+    
 
   }
 

@@ -218,12 +218,23 @@ public class Magazine extends Subsystem {
 
     public void rotateMagazine() {
         // Rotates the magazine until the rotation distance is achieved
-        System.out.println(magazineEncoder.getDistance());
-        if (magazineEncoder.getDistance() < RobotMap.magazineRotationDistance) {
+        magazineEncoder.reset();
+        do {
             magazineSpark.set(RobotMap.magazinePower);
-        } else {
-            magazineEncoder.reset();
-        }
+        } while (magazineEncoder.getDistance() < RobotMap.magazineRotationDistance);
+        magazineSpark.set(0.0);
+            
+
+        // if (magazineEncoder.getDistance() < RobotMap.magazineRotationDistance) {
+            
+
+
+        // }
+
+        // else {
+
+            
+        // }
         
     }
 
