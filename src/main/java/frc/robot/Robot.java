@@ -180,10 +180,6 @@ public class Robot extends TimedRobot {
     intake.intakeExtender.set(RobotMap.rollerExtendPower * 2);
     Timer.delay(2);
     intake.intakeExtender.set(0.0);
-    intake.intakeRoller.set(RobotMap.intakeSpeed);
-
-
-
   }
 
   @Override
@@ -197,18 +193,28 @@ public class Robot extends TimedRobot {
     System.out.println(m_LimelightDriveCommand);
 
 
-    // // Rotates about z-axis until it finds a target
-    // if (m_LimelightHasValidTarget) {
-    //   if (m_LimelightDriveCommand > -0.008 && m_LimelightDriveCommand < 0.008) {
-    //     shooter.topMotor.set(RobotMap.shooterPower);
-    //     shooter.bottomMotor.set(RobotMap.shooterPower);
-    //     intake.intakeRoller.set(RobotMap.intakeSpeed);
-    //     magazine.magazineSpark.set(RobotMap.magazinePower * 0.6);
+    boolean inPlace = false;
+    // Rotates about z-axis until it finds a target
+    if (m_LimelightHasValidTarget || inPlace) {
+      if (m_LimelightDriveCommand > -0.3 && m_LimelightDriveCommand < 0.3) {
+        if (inPlace) {
+          shooter.topMotor.set(RobotMap.shooterPower);
+          shooter.bottomMotor.set(RobotMap.shooterPower);
+          magazine.magazineSpark.set(RobotMap.magazinePower * 0.48);
+        } else {
+          shooter.topMotor.set(RobotMap.shooterPower);
+          shooter.bottomMotor.set(RobotMap.shooterPower);
+          // intake.intakeRoller.set(RobotMap.intakeSpeed);
+          Timer.delay(2.0);
+          magazine.magazineSpark.set(RobotMap.magazinePower * 0.48);
+          inPlace = true;
+        }
+        
 
-    //   } else {
-    //     drivetrain.drivetrain.arcadeDrive(-1 * m_LimelightDriveCommand, -1 * m_LimelightSteerCommand);
-    //   }
-    // }
+      } else {
+        drivetrain.drivetrain.arcadeDrive(-1 * m_LimelightDriveCommand, -1 * m_LimelightSteerCommand);
+      }
+    }
     // else {
     //   drivetrain.turnAround();
     // }
