@@ -53,7 +53,7 @@ public class RobotMap {
   public static int magazineEncoderA = 4;
   public static int magazineEncoderB = 5;
 
-  public static double magazinePower = 0.6;
+  public static double magazinePower = 0.85;
 
   public static double indexDelay = 0.5;  // indexDelay should be the same as indexDelayAdjusted
   public static double indexDelayAdjusted = 0.5; 

@@ -266,10 +266,14 @@ public class Robot extends TimedRobot {
     // Intake
 
     // In
-    intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * RobotMap.intakeSpeed);
+    // intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * RobotMap.intakeSpeed);
+
+    intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * 0.8);
+
+    intake.intakeRoller.set(XboxController1.getTriggerAxis(Hand.kLeft) * -0.8);
     
     // Out
-    intake.intakeRoller.set(XboxController1.getTriggerAxis(Hand.kRight) * RobotMap.intakeSpeed * -1);
+    // intake.intakeRoller.set(XboxController1.getTriggerAxis(Hand.kRight) * RobotMap.intakeSpeed * -1);
     
   
 
