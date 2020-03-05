@@ -73,6 +73,9 @@ public class Robot extends TimedRobot {
   private boolean m_LimelightHasValidTarget = false;
   private double m_LimelightDriveCommand = 0.0;
   private double m_LimelightSteerCommand = 0.0;
+
+  public static boolean yawModeOn = false;
+  public static boolean yawModePressed = false;
   
   
   @Override
@@ -202,6 +205,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // This is called periodically while the robot is in teleopreated mode
+    updateToggle();
+
     autonomous = false;
     changeAutonomous = false;
     Scheduler.getInstance().run();
@@ -220,12 +225,26 @@ public class Robot extends TimedRobot {
     //   RobotMap.autoMode = ! RobotMap.autoMode;
     // }
 
-    if (XboxController0.getBButton()) {
+    // if (XboxController1.getStickButtonPressed(Hand.kLeft)) {
+      
+    // }
+
+
+    if (yawModeOn) {
       // Fine tuning - yaw (about z-axis)
       double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kRight), 3));
 
       drivetrain.drivetrain.arcadeDrive(0, fineYaw);
     }
+
+    // if (XboxController1.getStickButtonReleased(Hand.kLeft)) {
+    //   // Fine tuning - yaw (about z-axis)
+    //   double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kRight), 3));
+
+    //   drivetrain.drivetrain.arcadeDrive(0, fineYaw);
+    // }
+
+  
 
     
 
@@ -530,6 +549,17 @@ public class Robot extends TimedRobot {
     m_LimelightDriveCommand = drive_cmd;
   }
   
+  public void updateToggle() {
+    if (XboxController0.getStickButton(Hand.kLeft)) {
+      if (!yawModePressed) {
+        yawModeOn = !yawModeOn;
+        yawModePressed = true;
+      }
+    } else {
+      yawModePressed = false;
+    }
+
+  }
 
 
   @Override
