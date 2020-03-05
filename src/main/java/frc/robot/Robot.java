@@ -209,11 +209,20 @@ public class Robot extends TimedRobot {
     System.out.println(magazine.magazineEncoder.getDistance());
 
     
-    if (XboxController1.getYButtonPressed()) {
-      RobotMap.autoMode = ! RobotMap.autoMode;
+    // if (XboxController1.getYButtonPressed()) {
+    //   RobotMap.autoMode = ! RobotMap.autoMode;
+    // }
+
+    if (XboxController0.getBButton()) {
+      // Fine tuning - yaw (about z-axis)
+      double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kRight), 3));
+
+      drivetrain.drivetrain.arcadeDrive(0, fineYaw);
     }
 
-    if (RobotMap.autoMode) {
+    
+
+    if (XboxController1.getYButton()) {
       // Turn on LED
       // table.getEntry("ledMode").setNumber(3);
       if (m_LimelightHasValidTarget) {
@@ -223,10 +232,7 @@ public class Robot extends TimedRobot {
         drivetrain.drivetrain.arcadeDrive(0, 0);
       }
 
-      // Fine tuning - yaw (about z-axis)
-      double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kRight), 3));
-
-      drivetrain.drivetrain.arcadeDrive(0, fineYaw);
+      
 
     } else {
       // Turn off LED
