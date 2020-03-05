@@ -22,7 +22,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
 import java.lang.System;
-// import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -76,7 +76,13 @@ public class Robot extends TimedRobot {
 
   public static boolean yawModeOn = false;
   public static boolean yawModePressed = false;
-  
+
+  public static boolean backwardIntakeOn = false;
+  public static boolean backwardIntakePressed = false;
+
+  public static boolean emergencyExpulsionOn = false;
+  public static boolean emergencyExpulsionPressed = false;
+
   
   @Override
   public void robotInit() {
@@ -99,6 +105,9 @@ public class Robot extends TimedRobot {
 
     // Resets intake speed adjustment
     RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
+
+    // Resets magazine rotation adjustment
+    RobotMap.magazineRotationDistanceAdjusted = RobotMap.magazineRotationDistance;
 
     RobotMap.collectMode = false;
     RobotMap.autoMode = false;
@@ -167,6 +176,12 @@ public class Robot extends TimedRobot {
     // limelight.m_autoSelected = limelight.m_chooser.getSelected();
     m_autoSelected = m_chooser.getSelected();
 
+    intake.intakeExtender.set(RobotMap.rollerExtendPower * 2);
+    Timer.delay(2);
+    intake.intakeExtender.set(0.0);
+    intake.intakeRoller.set(RobotMap.intakeSpeed);
+
+
 
   }
 
@@ -176,26 +191,33 @@ public class Robot extends TimedRobot {
     super.autonomousPeriodic();
     
     System.out.println("Auto");
-
+    
     updateTrackingData();
+    System.out.println(m_LimelightDriveCommand);
 
-    // Rotates about z-axis until it finds a target
-    if (m_LimelightHasValidTarget) {
-      if (m_LimelightDriveCommand < 0.1) {
-        magazine.magazineSpark.set(RobotMap.magazinePower);
-      } else {
-        drivetrain.drivetrain.arcadeDrive(-1 * m_LimelightDriveCommand, -1 * m_LimelightSteerCommand);
-      }
-    }
-    else {
-      drivetrain.turnAround();
-    }
+
+    // // Rotates about z-axis until it finds a target
+    // if (m_LimelightHasValidTarget) {
+    //   if (m_LimelightDriveCommand > -0.008 && m_LimelightDriveCommand < 0.008) {
+    //     shooter.topMotor.set(RobotMap.shooterPower);
+    //     shooter.bottomMotor.set(RobotMap.shooterPower);
+    //     intake.intakeRoller.set(RobotMap.intakeSpeed);
+    //     magazine.magazineSpark.set(RobotMap.magazinePower * 0.6);
+
+    //   } else {
+    //     drivetrain.drivetrain.arcadeDrive(-1 * m_LimelightDriveCommand, -1 * m_LimelightSteerCommand);
+    //   }
+    // }
+    // else {
+    //   drivetrain.turnAround();
+    // }
 }
 
   @Override
   public void teleopInit() {
     // This is called once when the robot first enters teleoperated mode
     magazine.magazineSpark.set(0.0);
+    intake.intakeRoller.set(0.0);
 
     // intake.intakeExtender.set(0.6);
     // Timer.delay(3);
@@ -232,9 +254,9 @@ public class Robot extends TimedRobot {
 
     if (yawModeOn) {
       // Fine tuning - yaw (about z-axis)
-      double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kRight), 3));
+      double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kLeft), 3));
 
-      drivetrain.drivetrain.arcadeDrive(0, fineYaw);
+      drivetrain.drivetrain.arcadeDrive(0, fineYaw * 3);
     }
 
     // if (XboxController1.getStickButtonReleased(Hand.kLeft)) {
@@ -248,7 +270,7 @@ public class Robot extends TimedRobot {
 
     
 
-    if (XboxController1.getYButton()) {
+    if (XboxController1.getXButton()) {
       // Turn on LED
       // table.getEntry("ledMode").setNumber(3);
       if (m_LimelightHasValidTarget) {
@@ -287,12 +309,19 @@ public class Robot extends TimedRobot {
     // In
     // intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * RobotMap.intakeSpeed);
 
-    intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * 0.8);
-
-    intake.intakeRoller.set(XboxController1.getTriggerAxis(Hand.kLeft) * -0.8);
+    if (backwardIntakeOn) {
+      intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * 0.8);
+    }
+    else if (emergencyExpulsionOn) {
+      // Emergency Expulsion
+      intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * RobotMap.intakeSpeed);
+      magazine.magazineSpark.set(XboxController0.getTriggerAxis(Hand.kLeft) * RobotMap.magazinePower * -1);
+    }
+    else {
+      intake.intakeRoller.set(XboxController0.getTriggerAxis(Hand.kLeft) * -0.8);
+    }
     
-    // Out
-    // intake.intakeRoller.set(XboxController1.getTriggerAxis(Hand.kRight) * RobotMap.intakeSpeed * -1);
+    
     
   
 
@@ -324,18 +353,49 @@ public class Robot extends TimedRobot {
       magazine.magazineSpark.set(0.0);
     }
 
-    if (XboxController1.getXButtonPressed()) {
+    // if (XboxController0.getBackButtonPressed()) {
+    //   intake.intakeRoller.set(1.0);
+    //   // magazine.magazineSpark.set(-1 * RobotMap.magazinePower);
+    // }
+    
+    // if (XboxController0.getBackButtonReleased()) {
+    //   intake.intakeRoller.set(0.0);
+    //   // magazine.magazineSpark.set(0.0);
+
+    // }
+
+    if (XboxController0.getBButtonPressed()) {
       RobotMap.collectMode = ! RobotMap.collectMode;
     }
 
+    if (XboxController1.getStartButtonPressed()) {
+      RobotMap.numberOfBalls = 0;
+      RobotMap.magazineRotationDistanceAdjusted = RobotMap.magazineRotationDistance;
+      RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
+      intake.intakeExtender.set(RobotMap.rollerExtendPower);
+      Timer.delay(1.5);
+      intake.intakeExtender.set(0.0);
+    }
 
-    if (XboxController1.getAButton()) {
+    if (XboxController1.getYButtonPressed()) {
       System.out.println("Extending...");
       elevator.extendMotor.set(RobotMap.extendPower);
     }
-    else {
+    if (XboxController1.getYButtonReleased()) {
       elevator.extendMotor.set(0.0);
     }
+
+    if (XboxController1.getAButtonPressed()) {
+      System.out.println("Retracting...");
+      elevator.extendMotor.set(RobotMap.extendPower * -1);
+    }
+    if (XboxController1.getAButtonReleased()) {
+      elevator.extendMotor.set(0.0);
+    }
+
+    // else {
+    //   elevator.extendMotor.set(0.0);
+    // }
   
     if (XboxController1.getBButton()) {
       System.out.println("Lifting...");
@@ -367,31 +427,44 @@ public class Robot extends TimedRobot {
 
 
 
-    // // Start Button - Shoot One Ball
-    // if (XboxController0.getBButtonPressed()) {
-    //   RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
-    //   if (RobotMap.rotationMode) {
-    //     magazine.rotateMagazine();
-    //     RobotMap.numberOfBalls--;
-    //   }
-    //   else {
-    //     // intake.intakeRoller.set(RobotMap.intakeSpeedAdjusted);
-    //     magazine.shootBall();
-    //   }
+    // Start Button - Shoot One Ball
+    if (XboxController0.getBButtonPressed()) {
+      RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
+      if (RobotMap.rotationMode) {
+        magazine.rotateMagazine();
+        RobotMap.numberOfBalls--;
+        if (RobotMap.numberOfBalls <= 2) {
+          intake.intakeRoller.set(RobotMap.intakeSpeed);
+        }
+      }
+      else {
+        // intake.intakeRoller.set(RobotMap.intakeSpeedAdjusted);
+        magazine.shootBall();
+      }
       
-    // }
+    }
 
-    // if (XboxController0.getBButtonReleased()) {
-    //   magazine.magazineSpark.set(0.0);
-    // }
+    if (XboxController0.getBButtonReleased()) {
+      magazine.magazineSpark.set(0.0);
+    }
 
 
 
     // A Button - Index One Ball
     if (XboxController0.getAButtonPressed()) {
       if (RobotMap.rotationMode) {
+        if (RobotMap.numberOfBalls == 2) {
+          RobotMap.magazineRotationDistanceAdjusted = RobotMap.magazineRotationDistance * 0.7;
+        } 
         magazine.rotateMagazine();
         RobotMap.numberOfBalls++;
+        if (RobotMap.numberOfBalls == 3) {
+          RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed * 0.4;
+          intake.intakeExtender.set(-1 * RobotMap.rollerExtendPower);
+          Timer.delay(1.5);
+          intake.intakeExtender.set(0.0);
+          
+        }
         // if (magazine.magazineEncoder.getDistance() < RobotMap.magazineRotationDistance) {
         //   magazine.magazineSpark.set(RobotMap.magazinePower);
         // }
@@ -550,13 +623,31 @@ public class Robot extends TimedRobot {
   }
   
   public void updateToggle() {
-    if (XboxController0.getStickButton(Hand.kLeft)) {
+    if (XboxController1.getStickButton(Hand.kLeft)) {
       if (!yawModePressed) {
         yawModeOn = !yawModeOn;
         yawModePressed = true;
       }
     } else {
       yawModePressed = false;
+    }
+
+    if (XboxController0.getStartButton()) {
+      if (!backwardIntakePressed) {
+        backwardIntakeOn = !backwardIntakeOn;
+        backwardIntakePressed = true;
+      } else {
+        backwardIntakePressed = false;
+      }
+    }
+
+    if (XboxController0.getBackButton()) {
+      if (!emergencyExpulsionPressed) {
+        emergencyExpulsionOn = !emergencyExpulsionOn;
+        emergencyExpulsionPressed = true;
+      } else {
+        emergencyExpulsionPressed = false;
+      }
     }
 
   }

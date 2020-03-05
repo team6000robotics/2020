@@ -221,7 +221,7 @@ public class Magazine extends Subsystem {
         magazineEncoder.reset();
         do {
             magazineSpark.set(RobotMap.magazinePower);
-        } while (magazineEncoder.getDistance() < RobotMap.magazineRotationDistance);
+        } while (magazineEncoder.getDistance() < RobotMap.magazineRotationDistanceAdjusted);
         magazineSpark.set(0.0);
             
 
