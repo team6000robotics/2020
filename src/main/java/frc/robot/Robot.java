@@ -155,6 +155,7 @@ public class Robot extends TimedRobot {
     // Activates USB camera connected to LimeLight
     table.getEntry("stream").setNumber(0);
 
+
     // Read values periodically
     double x = tx.getDouble(0.0);
     double y = ty.getDouble(0.0);
@@ -252,12 +253,12 @@ public class Robot extends TimedRobot {
     // }
 
 
-    if (yawModeOn) {
-      // Fine tuning - yaw (about z-axis)
-      double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kLeft), 3));
+    // if (yawModeOn) {
+    //   // Fine tuning - yaw (about z-axis)
+    //   double fineYaw = RobotMap.fineDrivetrainPower * (Math.pow(XboxController1.getX(Hand.kLeft), 3));
 
-      drivetrain.drivetrain.arcadeDrive(0, fineYaw * 3);
-    }
+    //   drivetrain.drivetrain.arcadeDrive(0, fineYaw * 3);
+    // }
 
     // if (XboxController1.getStickButtonReleased(Hand.kLeft)) {
     //   // Fine tuning - yaw (about z-axis)
@@ -368,7 +369,7 @@ public class Robot extends TimedRobot {
       RobotMap.collectMode = ! RobotMap.collectMode;
     }
 
-    if (XboxController1.getStartButtonPressed()) {
+    if (XboxController1.getStickButtonPressed(Hand.kRight)) {
       RobotMap.numberOfBalls = 0;
       RobotMap.magazineRotationDistanceAdjusted = RobotMap.magazineRotationDistance;
       RobotMap.intakeSpeedAdjusted = RobotMap.intakeSpeed;
@@ -623,14 +624,14 @@ public class Robot extends TimedRobot {
   }
   
   public void updateToggle() {
-    if (XboxController1.getStickButton(Hand.kLeft)) {
-      if (!yawModePressed) {
-        yawModeOn = !yawModeOn;
-        yawModePressed = true;
-      }
-    } else {
-      yawModePressed = false;
-    }
+    // if (XboxController1.getStickButton(Hand.kLeft)) {
+    //   if (!yawModePressed) {
+    //     yawModeOn = !yawModeOn;
+    //     yawModePressed = true;
+    //   }
+    // } else {
+    //   yawModePressed = false;
+    // }
 
     if (XboxController0.getStartButton()) {
       if (!backwardIntakePressed) {
@@ -641,7 +642,8 @@ public class Robot extends TimedRobot {
       }
     }
 
-    if (XboxController0.getBackButton()) {
+    // Emergency Expulsion
+    if (XboxController0.getStickButton(Hand.kRight)) {
       if (!emergencyExpulsionPressed) {
         emergencyExpulsionOn = !emergencyExpulsionOn;
         emergencyExpulsionPressed = true;
